@@ -6,19 +6,19 @@
           <div class="card-content white-text">
             <form @submit.prevent="login">
               <div class="input-field row">
-                <div class="col m6">
+                <div class="col m12">
                   <label>Email</label>
                   <input type="text" v-model="email" />
                 </div>
               </div>
               <div class="input-field row">
-                <div class="col m6">
+                <div class="col m12">
                   <label>Password</label>
                   <input type="password" v-model="password" />
                 </div>
               </div>
               <div class="row">
-                <div class="col m4">
+                <div class="col m6">
                   <button v-show="!loading" type="submit" class="btn">
                     Login<i class="material-icons right">security</i>
                   </button>
@@ -26,7 +26,7 @@
                     <div class="indeterminate"></div>
                   </div>
                 </div>
-                <div class="col m4">
+                <div class="col m6">
                   <router-link to="/register" class="btn"
                     >Sign Up<i class="material-icons right"
                       >add_person</i
@@ -61,15 +61,7 @@ export default {
       };
       this.loading = true;
       await this.axios
-        .post("http://localhost:3000/api/v1/auth/login", payload, {
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods":
-              "GET, POST, PATCH, PUT, DELETE, OPTIONS",
-            "Access-Control-Allow-Headers":
-              "Origin, Content-Type, X-Auth-Token",
-          },
-        })
+        .post("auth/login", payload)
         .then((response) => {
           this.axios.defaults.headers.common["Authorization"] =
             "Bearer " + response.data.accessToken;

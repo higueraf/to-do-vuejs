@@ -1,10 +1,17 @@
 <template>
   <nav>
     <div class="nav-wrapper teal">
-      <a href="#" class="brand-logo">To-Do App</a>
+      <router-link  class="brand-logo" to="/">To-Do App</router-link>
       <ul class="right hide-on-med-and-down">
-        <li v-if="$store.state.isAuthenticated"><a href="#" >User: {{$store.state.userName}}</a></li>
-        <li v-if="$store.state.isAuthenticated"><a href="#" @click="logUserOut">Logout</a></li>
+        <li v-if="$store.state.isAuthenticated"><router-link to="/">Home</router-link></li>
+        <li v-if="$store.state.isAdmin"><router-link to="/todo">Users</router-link></li>
+        <li v-if="$store.state.isAuthenticated"><router-link to="/todo">To-Do</router-link></li>
+        <li v-if="$store.state.isAuthenticated">
+          <a href="#">User: {{ $store.state.userName }}</a>
+        </li>
+        <li v-if="$store.state.isAuthenticated">
+          <a href="#" @click="this.$store.commit('logout')">Logout</a>
+        </li>
       </ul>
     </div>
   </nav>
@@ -21,17 +28,6 @@ export default {
     }
   },
   name: "App",
-  computed: {
-    logUserOut() {
-      this.axios.defaults.headers.common['Authorization'] = null;
-      this.$store.commit('setAuthenticated', false);
-      this.$store.commit('setUserName', null);
-      this.$store.commit('setUserEmail', null);
-      this.$store.commit('setIsAdmin', null);
-      this.$router.push("/login");
-    },
-
-  },
 };
 </script>
 
