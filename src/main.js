@@ -6,9 +6,9 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import router from './router'
 import store from './store/store'
-axios.defaults.baseURL = 'https://localhost:3000/api/v1';
+//axios.defaults.baseURL = 'http://localhost:3000/api/v1';
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
-
 
 var token = localStorage.getItem('token');
 if(token)

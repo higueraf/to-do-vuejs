@@ -1,5 +1,6 @@
 import { createStore } from 'vuex'
-
+import VuexPersistence from 'vuex-persist';
+import router from '.././router/index.js';
 
 export default createStore({
     state: {
@@ -24,7 +25,18 @@ export default createStore({
         setIsAdmin(state, value) {
             console.log('setIsAdmin', value);
             state.isAdmin = value;
+        },
+        logout(state) {
+            router.push('/login');
+            state.isAuthenticated = false;
+            state.userName = '';
+            state.userEmail = '';
+            state.isAdmin = false;
         }
-
     },
+    plugins: [
+        new VuexPersistence({
+            storage: window.localStorage
+        }).plugin
+    ]
 });

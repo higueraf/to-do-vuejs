@@ -78,7 +78,7 @@ export default {
       };
       this.loading = true;
       await this.axios
-        .post("http://localhost:3000/api/v1/auth/register", userData, {
+        .post("/auth/register", userData, {
           headers: {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Methods":
