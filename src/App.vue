@@ -1,11 +1,17 @@
 <template>
   <nav>
     <div class="nav-wrapper teal">
-      <router-link  class="brand-logo" to="/">To-Do App</router-link>
+      <router-link class="brand-logo" to="/">To-Do App</router-link>
       <ul class="right hide-on-med-and-down">
-        <li v-if="$store.state.isAuthenticated"><router-link to="/">Home</router-link></li>
-        <li v-if="$store.state.isAdmin"><router-link to="/todo">Users</router-link></li>
-        <li v-if="$store.state.isAuthenticated"><router-link to="/todo">To-Do</router-link></li>
+        <li v-if="$store.state.isAuthenticated">
+          <router-link to="/">Home</router-link>
+        </li>
+        <li v-if="$store.state.isAdmin">
+          <router-link to="/user">Users</router-link>
+        </li>
+        <li v-if="$store.state.isAuthenticated">
+          <router-link to="/todo">To-Do</router-link>
+        </li>
         <li v-if="$store.state.isAuthenticated">
           <a href="#">User: {{ $store.state.userName }}</a>
         </li>

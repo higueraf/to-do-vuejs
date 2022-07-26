@@ -23,7 +23,10 @@
           <td>{{ todo.description }}</td>
           <td>{{ todo.createdAt }}</td>
           <td>
-            <button class="btn" @click="openForm(todo.id, todo.description)">
+            <button
+              class="btn"
+              @click="openForm(todo.id, todo.description, todo.status)"
+            >
               <i class="material-icons center">edit</i>
             </button>
             <button
@@ -49,8 +52,17 @@
             <span class="helper-text"></span>
           </div>
         </div>
-        
-       
+        <div class="row">
+          <div class="input-field">
+            <div>Selected: {{ status }}</div>
+            <select v-model="status">
+              <option v-for="status in statuses" :value="status">
+                {{ status }}
+              </option>
+            </select>
+          </div>
+        </div>
+
         <div class="row">
           <div class="col m3">
             <button type="submit" class="btn" @click="save()">
@@ -109,23 +121,31 @@ export default {
       loading: false,
       current_page: 1,
       pages: 1,
-
       description: "",
       id: 0,
       idToDo: 0,
-      
+      status: "ACTIVE",
+      statuses: ["ACTIVE", "COMPLETED", "DELETED"],
       modals: [],
-      
     };
   },
   async mounted() {
     this.loading = true;
-    const response = await this.axios.get("to-do");
-    this.todos = response.data;
-    this.loading = false;
+    await this.axios
+      .get("to-do")
+      .then((response) => {
+        this.todos = response.data;
+        this.pages = response.data.last_page;
+        this.loading = false;
+      })
+      .catch((error) => {
+        if (error.response.status) this.$router.push("/login");
+      });
 
-    var elems = document.querySelectorAll(".modal");
-    var instances = M.Modal.init(elems, null);
+    const elemsModal = document.querySelectorAll(".modal");
+    const instancesModal = M.Modal.init(elemsModal, null);
+    const elemsSelect = document.querySelectorAll("select");
+    const instancesSelect = M.FormSelect.init(elemsSelect);
   },
   methods: {
     openForm(id, description, status) {
@@ -140,6 +160,7 @@ export default {
     save() {
       var payload = {
         description: this.description,
+        status: this.status,
       };
       if (this.idToDo == 0) {
         this.axios.post("to-do", payload).then((response) => {
@@ -154,6 +175,7 @@ export default {
           this.description = response.data.description;
           M.toast({ html: "To-Do updated successfully" });
         });
+        this.refresh();
       }
     },
     closeForm() {
@@ -182,6 +204,19 @@ export default {
         this.todos = this.todos.filter((todo) => todo.id != id);
         this.closeFormDelete();
       });
+    },
+    async refresh() {
+      this.loading = true;
+      await this.axios
+        .get("to-do")
+        .then((response) => {
+          this.todos = response.data;
+          this.pages = response.data.last_page;
+          this.loading = false;
+        })
+        .catch((error) => {
+          if (error.response.status) this.$router.push("/login");
+        });
     },
   },
 };
