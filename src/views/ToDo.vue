@@ -13,6 +13,7 @@
         <tr>
           <th>Id</th>
           <th>Description</th>
+          <th>Status</th>
           <th>Created Date</th>
           <th colspan="2">Actions</th>
         </tr>
@@ -21,11 +22,12 @@
         <tr v-for="todo in todos">
           <td>{{ todo.id }}</td>
           <td>{{ todo.description }}</td>
+          <td>{{ todo.state.toUpperCase() }}</td>
           <td>{{ todo.createdAt }}</td>
           <td>
             <button
               class="btn"
-              @click="openForm(todo.id, todo.description, todo.status)"
+              @click="openForm(todo.id, todo.description, todo.state)"
             >
               <i class="material-icons center">edit</i>
             </button>
@@ -54,10 +56,10 @@
         </div>
         <div class="row">
           <div class="input-field">
-            <div>Selected: {{ status }}</div>
-            <select v-model="status">
-              <option v-for="status in statuses" :value="status">
-                {{ status }}
+            <div>Selected: {{ state }}</div>
+            <select v-model="state">
+              <option v-for="state in states" :value="state">
+                {{ state }}
               </option>
             </select>
           </div>
@@ -124,8 +126,8 @@ export default {
       description: "",
       id: 0,
       idToDo: 0,
-      status: "ACTIVE",
-      statuses: ["ACTIVE", "COMPLETED", "DELETED"],
+      state: "ACTIVE",
+      states: ["ACTIVE", "COMPLETED", "DELETED"],
       modals: [],
     };
   },
@@ -134,6 +136,7 @@ export default {
     await this.axios
       .get("to-do")
       .then((response) => {
+        console.log(response);
         this.todos = response.data;
         this.pages = response.data.last_page;
         this.loading = false;
@@ -148,10 +151,10 @@ export default {
     const instancesSelect = M.FormSelect.init(elemsSelect);
   },
   methods: {
-    openForm(id, description, status) {
+    openForm(id, description, state) {
       this.idToDo = id || 0;
       this.description = description || "";
-      this.status = status || "ACTIVE";
+      this.state = state || "ACTIVE";
       var modalFormToDo = M.Modal.getInstance(
         document.getElementById("modal-form-to-do")
       );
@@ -160,22 +163,23 @@ export default {
     save() {
       var payload = {
         description: this.description,
-        status: this.status,
+        state: this.state,
       };
       if (this.idToDo == 0) {
         this.axios.post("to-do", payload).then((response) => {
           console.log("response", response);
           this.idToDo = response.data.id;
           this.description = response.data.description;
+          this.todos.unshift(response.data);
           M.toast({ html: "To-Do created successfully" });
         });
       } else {
         this.axios.put("to-do/" + this.idToDo, payload).then((response) => {
-          this.idToDo = response.id;
           this.description = response.data.description;
+          const index = this.todos.findIndex((el) => el.id == this.idToDo);
+          this.todos[index] = response.data;
           M.toast({ html: "To-Do updated successfully" });
         });
-        this.refresh();
       }
     },
     closeForm() {
@@ -204,19 +208,6 @@ export default {
         this.todos = this.todos.filter((todo) => todo.id != id);
         this.closeFormDelete();
       });
-    },
-    async refresh() {
-      this.loading = true;
-      await this.axios
-        .get("to-do")
-        .then((response) => {
-          this.todos = response.data;
-          this.pages = response.data.last_page;
-          this.loading = false;
-        })
-        .catch((error) => {
-          if (error.response.status) this.$router.push("/login");
-        });
     },
   },
 };
